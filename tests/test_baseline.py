@@ -14,7 +14,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CIBLE_EXACT = 0.788458126330731
+CIBLE_EXACT = 0.8102377572746629
+CIBLE_RAPPEL = 0.7223564248422037
 TOL = 1e-3
 
 
@@ -36,8 +37,10 @@ def test_fusion_cible() -> None:
     rappel = float(data["fusion"]["rappel"])
     if abs(exact - CIBLE_EXACT) > TOL:
         fail(f"exactitude fusion={exact}, attendu ~{CIBLE_EXACT}")
-    if abs(rappel - 0.6769266734200888) > TOL:
+    if abs(rappel - CIBLE_RAPPEL) > TOL:
         fail(f"rappel fusion={rappel}, hors tolérance")
+    if float(data["meta"]["poids_ia"]) != 0.35:
+        fail("meta.poids_ia doit être 0.35")
     ok(f"fusion exact={exact:.4f} rappel={rappel:.4f}")
 
 
@@ -98,7 +101,10 @@ def test_invariants_gaml() -> None:
         "trancher",
         "@user-begin(calcul_utilite)",
         "@user-begin(mise_a_jour_matrice_confusion)",
-        "@user-begin(signatures_rm1_rm8)",
+        "@user-begin(signatures_rm1_rm11)",
+        "service=telnet",
+        "num_failed_logins",
+        "poids_ia <- 0.35",
         "'P3', idc, 'regles'",
         "'P3', int(c[1]), 'ia'",
         "species AgentVue",
@@ -121,7 +127,7 @@ def main() -> int:
     test_modules_ml()
     test_invariants_gaml()
     print("-" * 60)
-    print("Baseline OK — exactitude cible ~0.789 préservée.")
+    print("Baseline OK — exactitude cible ~0.810 préservée.")
     return 0
 
 

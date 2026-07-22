@@ -11,7 +11,7 @@ Ce dépôt produit une simulation démontrable : les connexions NSL-KDD traverse
 | **Modèle** | `gama/models/ids_sma.gaml` |
 | **Expérience** | `ids_gui` |
 | **Classes** | NORMAL, DOS, PROBE, R2L, U2R |
-| **Cible validée** | exactitude ≈ **78,9 %** · rappel attaques ≈ **67,7 %** |
+| **Cible validée** | exactitude ≈ **81,0 %** · rappel attaques ≈ **72,2 %** |
 
 ## Sommaire
 
@@ -61,7 +61,7 @@ Niveau 4   generator/     Transformation : PyEcore + Jinja2 → artefacts GAML
 Niveau 5   gama/          Exécution : projet GAMA, ids_sma.gaml, ids_gui
                 ↑
 Transverse ml/            Apprentissage (règles, forêt, fusion) → artefacts injectés
-Transverse tests/         Garde-fous de non-régression (cible 0,789, invariants)
+Transverse tests/         Garde-fous de non-régression (cible 0,810, invariants)
 ```
 
 ### Rôle de chaque niveau
@@ -106,7 +106,7 @@ Ces règles sont opposables. Elles évitent que la chaîne IDM se dissolve en br
 
 Zones métier actuelles dans `ids_sma.gaml` :
 
-- `@user-begin(signatures_rm1_rm8)` : règles de détection
+- `@user-begin(signatures_rm1_rm11)` : règles de détection (RM1–RM11)
 - `@user-begin(calcul_utilite)` : fusion / utilité de décision
 - `@user-begin(mise_a_jour_matrice_confusion)` : journal et métriques
 
@@ -141,7 +141,7 @@ cd generator && python generer.py
 ### 3.6 Validation
 
 - Contrat Python : `python tests/test_baseline.py` (exactitude fusion ≈ 0,7885, invariants GAML).
-- Contrat simulation : moniteurs GAMA, cible ≈ 78,9 % / 67,7 %, `taux_panne = 0`.
+- Contrat simulation : moniteurs GAMA, cible ≈ 81,0 % / 72,2 %, `taux_panne = 0`, `poids_ia = 0,35`, `lambda_fp = 0`.
 - Les `[ALERTE]` console **ne valident pas** le système.
 
 ---
@@ -205,6 +205,7 @@ Communication métier : skill **FIPA** (`request`, `query`, `inform`, `refuse`).
 | Spam `[ALERTE]` | Confusion avec la métrique | `verbose_alertes = false` ; valider sur moniteurs |
 | Workspace Eclipse | Projet fantôme `06-gama` | Importer uniquement `gama/` |
 | Régénération dangereuse | Écrase le monolithe corrigé | Garde dans `generer.py` (refus sauf `forcer`) |
+| Plafond ~78,9 % sur R2L/U2R | Peu de signatures rares | RM9–RM11 + `poids_ia = 0,35` → ≈ 81,0 % |
 
 ### 5.3 Fusion décisionnelle
 
@@ -218,17 +219,18 @@ Mesures de référence (Python, `ml/artifacts/resultats_fusion.json`), jeu `KDDT
 
 | Source | Exactitude 5 classes | Rappel attaques |
 |---|---|---|
-| Règles seules | ≈ 60,6 % | ≈ 59,1 % |
+| Règles seules (RM1–RM11) | ≈ 62,7 % | ≈ 62,9 % |
 | IA seule | ≈ 76,5 % | ≈ 63,0 % |
-| **Fusion (cible)** | **≈ 78,9 %** | **≈ 67,7 %** |
+| **Fusion (cible)** | **≈ 81,0 %** | **≈ 72,2 %** |
 
 ### Critères d’acceptation simulation
 
 1. `taux_panne = 0` (mode nominal).
-2. Moniteur exactitude stabilisé vers **≈ 0,789**.
-3. Moniteur rappel vers **≈ 0,677**.
-4. Compteurs `decisions` et `journal` progressent **ensemble** (écart durable = bug de chaîne).
-5. `degradees` et `abandons` restent à 0 en nominal (sauf paramétrage panne volontaire).
+2. `poids_ia = 0,35` et `lambda_fp = 0` (alignés sur la référence Python).
+3. Moniteur exactitude stabilisé vers **≈ 0,810**.
+4. Moniteur rappel vers **≈ 0,722**.
+5. Compteurs `decisions` et `journal` progressent **ensemble** (écart durable = bug de chaîne).
+6. `degradees` et `abandons` restent à 0 en nominal (sauf paramétrage panne volontaire).
 
 Ce qui **ne** constitue **pas** une validation : volume de lignes `[ALERTE]`, warnings des Toy Models GAMA, exactitude binaire seule.
 
@@ -252,7 +254,7 @@ python tests/test_baseline.py
 | GAMA | Modèle exécutable, expérience GUI, CSV forêt, encodage généré |
 | Qualité | `verifier_tout.py`, `tests/test_baseline.py` |
 
-Le modèle GAMA actuel est **maintenu comme monolithe** (comportement validé à ~78,9 %). Le générateur reste la voie structurante pour encodage / forêt / squelette ; il ne doit pas écraser ce monolithe sans intention explicite.
+Le modèle GAMA actuel est **maintenu comme monolithe** (comportement validé à ~81,0 %). Le générateur reste la voie structurante pour encodage / forêt / squelette ; il ne doit pas écraser ce monolithe sans intention explicite.
 
 ---
 
@@ -363,7 +365,7 @@ Expérience `ids_gui` :
 | Limite | Sous-échantillon (`0` = tout le test) |
 | p_panne / p_reprise | Panne et reprise de l’agent IA |
 
-Défaut recommandé pour la cible 78,9 % : panne à **0**, limite à **0**, poids IA à **0,5**.
+Défaut recommandé pour la cible 81,0 % : panne à **0**, limite à **0**, poids IA à **0,35**, pénalité FP à **0**.
 
 ---
 

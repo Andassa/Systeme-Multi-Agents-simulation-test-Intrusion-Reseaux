@@ -81,7 +81,7 @@ def main():
     # Ce test est destructif par nature : il vide le fichier, y écrit du code
     # factice, régénère plusieurs fois. Tant que les zones protégées étaient
     # vides, c'était sans conséquence. Depuis l'Étape 6 elles contiennent le
-    # code métier — signatures RM1–RM8, fusion d'utilité, matrice de confusion
+    # code métier — signatures RM1–RM11, fusion d'utilité, matrice de confusion
     # — et une exécution du test l'effaçait intégralement.
     #
     # Le défaut a été trouvé en constatant que ids_sma.gaml avait perdu 5 Ko

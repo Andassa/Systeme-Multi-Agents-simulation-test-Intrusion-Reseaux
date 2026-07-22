@@ -16,8 +16,8 @@ global {
     int NB_CLASSES <- 5;
     int NB_FEATURES <- 122;
 
-    float poids_ia <- 0.5;
-    float lambda_fp <- 0.2;
+    float poids_ia <- 0.35;
+    float lambda_fp <- 0.0;
     int delai_garde <- 3;
     float seuil_alerte <- 0.5;
     int debit_capture <- 10;
@@ -88,7 +88,7 @@ global {
         create AgentDecision { location <- {68, 40}; libelle <- 'decision INACTIF q=0'; }
         create AgentAlertes { location <- {88, 22}; libelle <- 'alertes n=0'; }
         create AgentJournalisation { location <- {88, 58}; libelle <- 'journal n=0'; }
-        write 'IDS-SMA pret - ' + string(donnees_nslkdd.rows) + ' connexions, cible exactitude ~0.789';
+        write 'IDS-SMA pret - ' + string(donnees_nslkdd.rows) + ' connexions, cible exactitude ~0.810';
     }
 }
 
@@ -164,14 +164,14 @@ species AgentExtraction parent: AgentVue {
 species AgentReglesDetection parent: AgentVue {
     string identifiant <- 'regles';
     rgb couleur <- rgb(255, 127, 14);
-    int nb_regles <- 8;
+    int nb_regles <- 11;
     int nb_declenchements <- 0;
     int nb_abstentions <- 0;
 
     list<float> evaluer_signatures (list<float> v) {
         list<float> p <- list_with(NB_CLASSES, 1.0 / NB_CLASSES);
         bool declenchee <- false;
-        // @user-begin(signatures_rm1_rm8)
+        // @user-begin(signatures_rm1_rm11)
         float meilleure <- 0.0;
         int classe_retenue <- 0;
 
@@ -193,11 +193,24 @@ species AgentReglesDetection parent: AgentVue {
         if (world.valeur_brute(v, int(IDX['rerror_rate'])) > 0.8 and world.valeur_brute(v, int(IDX['count'])) >= 50 and 0.233 > meilleure) {
             meilleure <- 0.233; classe_retenue <- 2;
         }
-        if (world.valeur_brute(v, int(IDX['is_guest_login'])) = 1 and world.valeur_brute(v, int(IDX['hot'])) >= 2 and 0.264 > meilleure) {
-            meilleure <- 0.264; classe_retenue <- 3;
+        if (world.valeur_brute(v, int(IDX['is_guest_login'])) = 1 and world.valeur_brute(v, int(IDX['hot'])) >= 1 and 0.265 > meilleure) {
+            meilleure <- 0.265; classe_retenue <- 3;
         }
         if (world.valeur_brute(v, int(IDX['num_file_creations'])) >= 1 and world.valeur_brute(v, int(IDX['num_shells'])) >= 1 and 0.500 > meilleure) {
             meilleure <- 0.500; classe_retenue <- 4;
+        }
+        if (world.valeur_brute(v, int(IDX['num_failed_logins'])) >= 1 and world.valeur_brute(v, int(IDX['logged_in'])) = 0
+            and (float(v[int(IDX['service=telnet'])]) = 1.0 or float(v[int(IDX['service=login'])]) = 1.0
+                or float(v[int(IDX['service=ssh'])]) = 1.0 or float(v[int(IDX['service=ftp'])]) = 1.0
+                or float(v[int(IDX['service=pop_3'])]) = 1.0 or float(v[int(IDX['service=imap4'])]) = 1.0)
+            and 0.547 > meilleure) {
+            meilleure <- 0.547; classe_retenue <- 3;
+        }
+        if (float(v[int(IDX['service=telnet'])]) = 1.0 and world.valeur_brute(v, int(IDX['num_failed_logins'])) >= 1 and 0.565 > meilleure) {
+            meilleure <- 0.565; classe_retenue <- 3;
+        }
+        if (world.valeur_brute(v, int(IDX['root_shell'])) = 1 and world.valeur_brute(v, int(IDX['num_file_creations'])) >= 1 and 0.467 > meilleure) {
+            meilleure <- 0.467; classe_retenue <- 4;
         }
 
         if (meilleure > 0.0) {
@@ -207,7 +220,7 @@ species AgentReglesDetection parent: AgentVue {
             }
             p[classe_retenue] <- meilleure;
         }
-        // @user-end(signatures_rm1_rm8)
+        // @user-end(signatures_rm1_rm11)
         if (declenchee) {
             nb_declenchements <- nb_declenchements + 1;
         } else {
@@ -445,7 +458,7 @@ species AgentDecision parent: AgentVue control: weighted_tasks {
         if (nb_decisions mod 500 = 0) {
             write '[progres] ' + string(nb_decisions) + '/' + string(donnees_nslkdd.rows)
                 + ' exactitude=' + string(exactitude_courante with_precision 3)
-                + ' (cible ~0.789) rappel=' + string(rappel_courant with_precision 3);
+                + ' (cible ~0.810) rappel=' + string(rappel_courant with_precision 3);
         }
         etatDecision <- 'INACTIF';
         libelle <- identifiant + ' INACTIF q=' + length(file_idc);

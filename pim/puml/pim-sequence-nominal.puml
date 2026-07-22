@@ -45,7 +45,7 @@ deactivate IA
 note left of IA : e6 VERDICT_IA
 
 activate REG
-REG -> REG : evaluer()\nsignatures RM1..RM8
+REG -> REG : evaluer()\nsignatures RM1..RM11
 REG --> DEC : INFORM(Verdict[Regles])
 deactivate REG
 note left of REG : e5 VERDICT_REGLES\njustification := "RM3"

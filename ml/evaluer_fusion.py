@@ -15,7 +15,7 @@ from data_paths import ROOT, artifact, find_nslkdd
 from metrics import confusion, measures
 
 
-def main(poids_ia: float = 0.5) -> int:
+def main(poids_ia: float = 0.35) -> int:
     data = __import__("numpy").load(artifact("donnees.npz"))
     xte, yte = data["Xte"], data["yte"]
     modele = pickle.load(open(artifact("modele_final.pkl"), "rb"))
@@ -36,13 +36,13 @@ def main(poids_ia: float = 0.5) -> int:
         "poids_ia": poids_ia,
         "abstentions": int((~tirs).sum()),
         "taux_abstention": float((~tirs).mean()),
-        "base_regles": "v3 — confiances = précision mesurée sur le train",
+        "base_regles": "v4 — RM1-RM11, confiances = précision train, poids_ia=0.35",
     }
 
     sortie = artifact("resultats_fusion.json")
     sortie.write_text(json.dumps(resultats, indent=1), encoding="utf-8")
 
-    print("Référence fusion (v3)")
+    print("Référence fusion (v4)")
     print(f"  n={len(yte)}  abstentions={resultats['meta']['abstentions']}")
     for nom in ("regles", "ia", "fusion"):
         r = resultats[nom]

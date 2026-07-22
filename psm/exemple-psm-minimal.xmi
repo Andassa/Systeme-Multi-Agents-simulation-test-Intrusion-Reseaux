@@ -24,9 +24,9 @@
                commentaire="Valeur non confirmée par la doc 2025-06. Point de correction unique (PSM 5.4)."/>
     <attributs nom="CLASSES" type="LIST" typeElement="STRING"
                initialisation="['NORMAL','DOS','PROBE','R2L','U2R']"/>
-    <attributs nom="poids_ia" type="FLOAT" initialisation="0.5" estParametre="true"
+    <attributs nom="poids_ia" type="FLOAT" initialisation="0.35" estParametre="true"
                libelle="Poids de la source IA" minimum="0.0" maximum="1.0" categorie="Fusion"/>
-    <attributs nom="lambda_fp" type="FLOAT" initialisation="0.2" estParametre="true"
+    <attributs nom="lambda_fp" type="FLOAT" initialisation="0.0" estParametre="true"
                libelle="Pénalité de faux positif" minimum="0.0" maximum="1.0" categorie="Fusion"/>
     <attributs nom="niveau_menace" type="FLOAT" initialisation="0.0"/>
   </sectionGlobale>

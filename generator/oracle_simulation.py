@@ -22,7 +22,7 @@ Un écart ici est un défaut du code métier. Une correspondance ici ne garantit
 pas que GAMA compilera, mais garantit que s'il compile, il calculera juste.
 
 Correspondance ligne à ligne avec les zones protégées de ids_sma.gaml :
-    signatures_rm1_rm8            -> evaluer_signatures()
+    signatures_rm1_rm11           -> evaluer_signatures()
     calcul_utilite                -> utilite()
     mise_a_jour_matrice_confusion -> mettre_a_jour()
 """
@@ -52,7 +52,7 @@ def valeur_brute(v, j, bmin, bmax):
 
 
 # ==========================================================================
-# Transcription de la zone signatures_rm1_rm8
+# Transcription de la zone signatures_rm1_rm11
 # ==========================================================================
 def evaluer_signatures(v, IDX, bmin, bmax):
     p = [1.0 / NB] * NB          # ABSTENTION par défaut
@@ -73,11 +73,28 @@ def evaluer_signatures(v, IDX, bmin, bmax):
         meilleure, classe = 0.684, 2
     if br("rerror_rate") > 0.8 and br("count") >= 50 and 0.233 > meilleure:
         meilleure, classe = 0.233, 2
-    if br("is_guest_login") == 1 and br("hot") >= 2 and 0.264 > meilleure:
-        meilleure, classe = 0.264, 3
+    if br("is_guest_login") == 1 and br("hot") >= 1 and 0.265 > meilleure:
+        meilleure, classe = 0.265, 3
     if br("num_file_creations") >= 1 and br("num_shells") >= 1 \
             and 0.500 > meilleure:
         meilleure, classe = 0.500, 4
+    svc_r2l = (
+        v[IDX["service=telnet"]] == 1.0
+        or v[IDX["service=login"]] == 1.0
+        or v[IDX["service=ssh"]] == 1.0
+        or v[IDX["service=ftp"]] == 1.0
+        or v[IDX["service=pop_3"]] == 1.0
+        or v[IDX["service=imap4"]] == 1.0
+    )
+    if br("num_failed_logins") >= 1 and br("logged_in") == 0 and svc_r2l \
+            and 0.547 > meilleure:
+        meilleure, classe = 0.547, 3
+    if v[IDX["service=telnet"]] == 1.0 and br("num_failed_logins") >= 1 \
+            and 0.565 > meilleure:
+        meilleure, classe = 0.565, 3
+    if br("root_shell") == 1 and br("num_file_creations") >= 1 \
+            and 0.467 > meilleure:
+        meilleure, classe = 0.467, 4
 
     if meilleure > 0.0:
         p = [(1.0 - meilleure) / (NB - 1)] * NB
@@ -153,7 +170,7 @@ def main(limite=None):
     if limite:
         X = X[:limite]
 
-    poids_ia, lambda_fp, menace = 0.5, 0.2, 0.0
+    poids_ia, lambda_fp, menace = 0.35, 0.0, 0.0
     alpha, beta = 0.99, 0.05
 
     mc = np.zeros((NB, NB), dtype=int)
@@ -197,7 +214,7 @@ def main(limite=None):
               f" {100 * r:8.2f}% {100 * f:8.2f}%")
 
     print()
-    print("  Référence indépendante — ml/evaluer_fusion.py (base v3)")
+    print("  Référence indépendante — ml/evaluer_fusion.py (base v4)")
     print("  " + "-" * 66)
     ref = json.load(open(os.path.join(RACINE, "ml", "artifacts", "resultats_fusion.json"),
                          encoding="utf-8"))
@@ -223,7 +240,7 @@ def main(limite=None):
     # exactement, et une coïncidence parfaite signalerait au contraire que la
     # dynamique de menace n'a aucun effet.
     ok = ecart_max < 0.002
-    print("  =>", "MÉTIER CONFORME AUX MESURES DE L'ÉTAPE 3" if ok
+    print("  =>", "MÉTIER CONFORME AUX MESURES DE RÉFÉRENCE FUSION" if ok
           else "ÉCART SIGNIFICATIF — le code métier ne reproduit pas les mesures")
 
     sortie = os.path.join(RACINE, "gama", "resultats_oracle.json")

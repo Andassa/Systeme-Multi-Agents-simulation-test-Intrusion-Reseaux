@@ -70,7 +70,7 @@ global {
         ]);
 
     // Index nomme des 122 composantes du vecteur encode.
-    // Permet d'ecrire les signatures RM1-RM8 avec les noms de variables du
+    // Permet d'ecrire les signatures RM1-RM11 avec les noms de variables du
     // CIM (`IDX['count']`, `IDX['flag=S0']`) plutot qu'avec des indices
     // numeriques, qu'aucun relecteur ne pourrait verifier.
     map<string, int> IDX <- map([
@@ -108,7 +108,7 @@ global {
      * Valeur BRUTE d'une composante numerique, reconstituee depuis le vecteur
      * normalise.
      *
-     * Necessaire parce que les signatures RM1-RM8 du CIM sont enoncees en
+     * Necessaire parce que les signatures RM1-RM11 du CIM sont enoncees en
      * unites reelles (" count >= 100 ", " src_bytes > 1000 ") alors que
      * l'AgentReglesDetection recoit le vecteur normalise. Convertir les seuils
      * plutot que les valeurs aurait donne un code illisible et inverifiable
@@ -116,7 +116,7 @@ global {
      *
      * RESERVE : le test a ete ecrete a [0,1]. Une valeur superieure au maximum
      * du train est donc reconstituee a ce maximum, pas a sa valeur d'origine.
-     * Sans effet sur RM1-RM8, dont les seuils sont tous tres inferieurs aux
+     * Sans effet sur RM1-RM11, dont les seuils sont tous tres inferieurs aux
      * maxima - mais toute signature future a seuil eleve devrait le savoir.
      */
     float valeur_brute (list<float> v, int j) {

@@ -7,12 +7,12 @@
     <attributs nom="CLASSES" type="LIST" initialisation="['NORMAL','DOS','PROBE','R2L','U2R']" typeElement="STRING" />
     <attributs nom="NB_CLASSES" type="INT" initialisation="5" />
     <attributs nom="NB_FEATURES" type="INT" initialisation="122" />
-    <attributs nom="poids_ia" type="FLOAT" initialisation="0.5" estParametre="true" libelle="Poids de la source IA" minimum="0.0" maximum="1.0" categorie="Fusion" />
-    <attributs nom="lambda_fp" type="FLOAT" initialisation="0.2" estParametre="true" libelle="Pénalité de faux positif" minimum="0.0" maximum="1.0" categorie="Fusion" />
+    <attributs nom="poids_ia" type="FLOAT" initialisation="0.35" estParametre="true" libelle="Poids de la source IA" minimum="0.0" maximum="1.0" categorie="Fusion" />
+    <attributs nom="lambda_fp" type="FLOAT" initialisation="0.0" estParametre="true" libelle="Pénalité de faux positif" minimum="0.0" maximum="1.0" categorie="Fusion" />
     <attributs nom="delai_garde" type="INT" initialisation="3" estParametre="true" libelle="Délai de garde tau (cycles)" minimum="1" maximum="20" categorie="Fusion" />
     <attributs nom="seuil_alerte" type="FLOAT" initialisation="0.5" estParametre="true" libelle="Seuil de gravité d'alerte" minimum="0.0" maximum="1.0" categorie="Alertes" />
-    <attributs nom="debit_capture" type="INT" initialisation="5" estParametre="true" libelle="Connexions lues par cycle" minimum="1" maximum="100" categorie="Capture" />
-    <attributs nom="capacite_file" type="INT" initialisation="50" estParametre="true" libelle="Capacité des files d'entrée (EF11)" minimum="1" maximum="500" categorie="Capture" />
+    <attributs nom="debit_capture" type="INT" initialisation="10" estParametre="true" libelle="Connexions lues par cycle" minimum="1" maximum="100" categorie="Capture" />
+    <attributs nom="capacite_file" type="INT" initialisation="200" estParametre="true" libelle="Capacité des files d'entrée (EF11)" minimum="1" maximum="500" categorie="Capture" />
     <attributs nom="taux_panne" type="FLOAT" initialisation="0.01" estParametre="true" libelle="p_f — probabilité de panne par cycle" minimum="0.0" maximum="0.5" categorie="Pannes" />
     <attributs nom="taux_reprise" type="FLOAT" initialisation="0.20" estParametre="true" libelle="p_r — probabilité de reprise par cycle" minimum="0.0" maximum="1.0" categorie="Pannes" />
     <attributs nom="alpha_menace" type="FLOAT" initialisation="0.99" estParametre="true" libelle="Décroissance du niveau de menace" minimum="0.0" maximum="1.0" categorie="Menace" />
@@ -84,14 +84,14 @@
   </especes>
   <especes nom="AgentReglesDetection" architecture="REFLEX" skills="FIPA" classePim="AgentReactif::AgentReglesDetection" xmi:id="AgentReglesDetection">
     <attributs nom="identifiant" type="STRING" initialisation="'regles'" />
-    <attributs nom="nb_regles" type="INT" initialisation="8" />
+    <attributs nom="nb_regles" type="INT" initialisation="11" />
     <attributs nom="nb_declenchements" type="INT" initialisation="0" />
     <attributs nom="nb_abstentions" type="INT" initialisation="0" />
     <actions nom="evaluer_signatures" typeRetour="LIST">
       <parametres nom="v" type="LIST" />
       <corps xsi:type="gamlpsm:Affectation" cible="p" expression="list_with(NB_CLASSES, 1.0 / NB_CLASSES)" declaration="LIST" commentaire="PIM §3.1 — ABSTENTION par défaut : distribution uniforme, entropie maximale. Surtout PAS 'NORMAL avec confiance 1'. Cette erreur a coûté 5 points de rappel à l'Étape 3." />
       <corps xsi:type="gamlpsm:Affectation" cible="declenchee" expression="false" declaration="BOOL" />
-      <corps xsi:type="gamlpsm:ZoneProtegee" identifiant="signatures_rm1_rm8" intention="Évaluer les 8 signatures RM1 à RM8 du CIM §5.1 sur le vecteur v. Si une signature se déclenche : declenchee &lt;- true, p[classe] &lt;- confiance, et p[k] &lt;- (1 - confiance) / (NB_CLASSES - 1) pour les autres. Si aucune ne se déclenche, LAISSER p uniforme — ne rien affirmer. Les signatures ne couvrent que 34,6 % de KDDTest+." contenuParDefaut="// à compléter" />
+      <corps xsi:type="gamlpsm:ZoneProtegee" identifiant="signatures_rm1_rm11" intention="Évaluer les 11 signatures RM1 à RM11 du CIM §5.2 sur le vecteur v. Si une signature se déclenche : declenchee &lt;- true, p[classe] &lt;- confiance, et p[k] &lt;- (1 - confiance) / (NB_CLASSES - 1) pour les autres. Si aucune ne se déclenche, LAISSER p uniforme. Confiances = précisions KDDTrain+." contenuParDefaut="// à compléter" />
       <corps xsi:type="gamlpsm:Conditionnelle" condition="declenchee">
         <alors xsi:type="gamlpsm:Affectation" cible="nb_declenchements" expression="nb_declenchements + 1" />
         <sinon xsi:type="gamlpsm:Affectation" cible="nb_abstentions" expression="nb_abstentions + 1" />

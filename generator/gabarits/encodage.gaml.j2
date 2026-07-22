@@ -43,7 +43,7 @@ global {
 {%- endfor %}
 
     // Index nommé des {{ nb_features }} composantes du vecteur encodé.
-    // Permet d'écrire les signatures RM1–RM8 avec les noms de variables du
+    // Permet d'écrire les signatures RM1–RM11 avec les noms de variables du
     // CIM (`IDX['count']`, `IDX['flag=S0']`) plutôt qu'avec des indices
     // numériques, qu'aucun relecteur ne pourrait vérifier.
     map<string, int> IDX <- {{ index_features }};
@@ -52,7 +52,7 @@ global {
      * Valeur BRUTE d'une composante numérique, reconstituée depuis le vecteur
      * normalisé.
      *
-     * Nécessaire parce que les signatures RM1–RM8 du CIM sont énoncées en
+     * Nécessaire parce que les signatures RM1–RM11 du CIM sont énoncées en
      * unités réelles (« count >= 100 », « src_bytes > 1000 ») alors que
      * l'AgentReglesDetection reçoit le vecteur normalisé. Convertir les seuils
      * plutôt que les valeurs aurait donné un code illisible et invérifiable
@@ -60,7 +60,7 @@ global {
      *
      * RÉSERVE : le test a été écrêté à [0,1]. Une valeur supérieure au maximum
      * du train est donc reconstituée à ce maximum, pas à sa valeur d'origine.
-     * Sans effet sur RM1–RM8, dont les seuils sont tous très inférieurs aux
+     * Sans effet sur RM1–RM11, dont les seuils sont tous très inférieurs aux
      * maxima — mais toute signature future à seuil élevé devrait le savoir.
      */
     float valeur_brute (list<float> v, int j) {

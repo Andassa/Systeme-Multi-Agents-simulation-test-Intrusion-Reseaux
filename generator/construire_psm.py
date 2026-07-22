@@ -159,17 +159,17 @@ def construire_global(racine):
     attribut(g, "NB_FEATURES", "INT", "122")
 
     # -- paramètres exposés à l'expérience (EF9) ---------------------------
-    parametre(g, "poids_ia", "FLOAT", "0.5", "Poids de la source IA",
+    parametre(g, "poids_ia", "FLOAT", "0.35", "Poids de la source IA",
               "0.0", "1.0", "Fusion")
-    parametre(g, "lambda_fp", "FLOAT", "0.2", "Pénalité de faux positif",
+    parametre(g, "lambda_fp", "FLOAT", "0.0", "Pénalité de faux positif",
               "0.0", "1.0", "Fusion")
     parametre(g, "delai_garde", "INT", "3", "Délai de garde tau (cycles)",
               "1", "20", "Fusion")
     parametre(g, "seuil_alerte", "FLOAT", "0.5", "Seuil de gravité d'alerte",
               "0.0", "1.0", "Alertes")
-    parametre(g, "debit_capture", "INT", "5",
+    parametre(g, "debit_capture", "INT", "10",
               "Connexions lues par cycle", "1", "100", "Capture")
-    parametre(g, "capacite_file", "INT", "50",
+    parametre(g, "capacite_file", "INT", "200",
               "Capacité des files d'entrée (EF11)", "1", "500", "Capture")
     parametre(g, "taux_panne", "FLOAT", "0.0",
               "p_f — probabilité de panne par cycle", "0.0", "0.5", "Pannes")
@@ -327,7 +327,7 @@ def agent_regles(racine):
     s = espece(racine, "AgentReglesDetection",
                "AgentReactif::AgentReglesDetection")
     attribut(s, "identifiant", "STRING", "'regles'")
-    attribut(s, "nb_regles", "INT", "8")
+    attribut(s, "nb_regles", "INT", "11")
     attribut(s, "nb_declenchements", "INT", "0")
     attribut(s, "nb_abstentions", "INT", "0")
 
@@ -340,12 +340,12 @@ def agent_regles(racine):
                     "entropie maximale. Surtout PAS 'NORMAL avec confiance 1'. "
                     "Cette erreur a coûté 5 points de rappel à l'Étape 3.")
     aff(a, "declenchee", "false", declaration="BOOL")
-    zone(a, "signatures_rm1_rm8",
-         "Évaluer les 8 signatures RM1 à RM8 du CIM §5.1 sur le vecteur v. "
+    zone(a, "signatures_rm1_rm11",
+         "Évaluer les 11 signatures RM1 à RM11 du CIM §5.2 sur le vecteur v. "
          "Si une signature se déclenche : declenchee <- true, p[classe] <- confiance, "
          "et p[k] <- (1 - confiance) / (NB_CLASSES - 1) pour les autres. "
          "Si aucune ne se déclenche, LAISSER p uniforme — ne rien affirmer. "
-         "Les signatures ne couvrent que 34,6 % de KDDTest+.")
+         "Confiances = précisions mesurées sur KDDTrain+ (pas sur le test).")
     si_ = si(a, "declenchee")
     aff(si_, "nb_declenchements", "nb_declenchements + 1", balise="alors")
     aff(si_, "nb_abstentions", "nb_abstentions + 1", balise="sinon")
